@@ -3,6 +3,10 @@
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\CarController;
+use App\Http\Controllers\ReservationController;
+use App\Http\Controllers\ReturnController;
+use App\Http\Controllers\MaintenanceController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -20,8 +24,10 @@ Route::middleware('auth')->group(function () {
 
 require __DIR__.'/auth.php';
 
-Route::resource('users', UserController::class);
-Route::resource('cars', CarController::class);
-Route::resource('reservations', ReservationController::class);
-Route::resource('returns', ReturnController::class);
-Route::resource('maintenances', MaintenanceController::class);
+Route::middleware('auth')->group(function () {
+    Route::resource('users', UserController::class);
+    Route::resource('cars', CarController::class);
+    Route::resource('reservations', ReservationController::class);
+    Route::resource('returns', ReturnController::class);
+    Route::resource('maintenances', MaintenanceController::class);
+});
