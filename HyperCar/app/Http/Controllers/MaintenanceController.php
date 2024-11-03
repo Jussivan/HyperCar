@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Maintenance;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class MaintenanceController extends Controller
 {
@@ -12,7 +13,8 @@ class MaintenanceController extends Controller
      */
     public function index()
     {
-        //
+        $maintenances = Maintenance::all();
+        return view('maintenances.index', compact('maintenances'));
     }
 
     /**
@@ -20,7 +22,7 @@ class MaintenanceController extends Controller
      */
     public function create()
     {
-        //
+        return view('maintenances.create');
     }
 
     /**
@@ -28,7 +30,20 @@ class MaintenanceController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validator = Validator::make($request->all(), [
+            'description' => 'required|string|max:255',
+            'date' => 'required|date',
+            'car_id' => 'required|exists:cars,id',
+        ]);
+
+        if ($validator->fails()) {
+            return redirect()->route('maintenances.create')
+                             ->withErrors($validator)
+                             ->withInput();
+        }
+
+        Maintenance::create($request->all());
+        return redirect()->route('maintenances.index')->with('success', 'Maintenance created successfully.');
     }
 
     /**
@@ -36,7 +51,7 @@ class MaintenanceController extends Controller
      */
     public function show(Maintenance $maintenance)
     {
-        //
+        return view('maintenances.show', compact('maintenance'));
     }
 
     /**
@@ -44,7 +59,7 @@ class MaintenanceController extends Controller
      */
     public function edit(Maintenance $maintenance)
     {
-        //
+        return view('maintenances.edit', compact('maintenance'));
     }
 
     /**
@@ -52,7 +67,20 @@ class MaintenanceController extends Controller
      */
     public function update(Request $request, Maintenance $maintenance)
     {
-        //
+        $validator = Validator::make($request->all(), [
+            'description' => 'required|string|max:255',
+            'date' => 'required|date',
+            'car_id' => 'required|exists:cars,id',
+        ]);
+
+        if ($validator->fails()) {
+            return redirect()->route('maintenances.edit', $maintenance->id)
+                             ->withErrors($validator)
+                             ->withInput();
+        }
+
+        $maintenance->update($request->all());
+        return redirect()->route('maintenances.index')->with('success', 'Maintenance updated successfully.');
     }
 
     /**
@@ -60,6 +88,7 @@ class MaintenanceController extends Controller
      */
     public function destroy(Maintenance $maintenance)
     {
-        //
+        $maintenance->delete();
+        return redirect()->route('maintenances.index')->with('success', 'Maintenance deleted successfully.');
     }
 }

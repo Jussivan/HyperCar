@@ -12,7 +12,8 @@ class ReservationController extends Controller
      */
     public function index()
     {
-        //
+        $reservations = Reservation::all();
+        return view('reservations.index', compact('reservations'));
     }
 
     /**
@@ -20,7 +21,7 @@ class ReservationController extends Controller
      */
     public function create()
     {
-        //
+        return view('reservations.create');
     }
 
     /**
@@ -28,7 +29,16 @@ class ReservationController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validatedData = $request->validate([
+            'car_id' => 'required|exists:cars,id',
+            'user_id' => 'required|exists:users,id',
+            'start_date' => 'required|date',
+            'end_date' => 'required|date|after:start_date',
+        ]);
+
+        Reservation::create($validatedData);
+
+        return redirect()->route('reservations.index')->with('status', 'Reservation created successfully.');
     }
 
     /**
@@ -36,7 +46,7 @@ class ReservationController extends Controller
      */
     public function show(Reservation $reservation)
     {
-        //
+        return view('reservations.show', compact('reservation'));
     }
 
     /**
@@ -44,7 +54,7 @@ class ReservationController extends Controller
      */
     public function edit(Reservation $reservation)
     {
-        //
+        return view('reservations.edit', compact('reservation'));
     }
 
     /**
@@ -52,7 +62,14 @@ class ReservationController extends Controller
      */
     public function update(Request $request, Reservation $reservation)
     {
-        //
+        $validatedData = $request->validate([
+            'start_date' => 'required|date',
+            'end_date' => 'required|date|after:start_date',
+        ]);
+
+        $reservation->update($validatedData);
+
+        return redirect()->route('reservations.index')->with('status', 'Reservation updated successfully.');
     }
 
     /**
@@ -60,6 +77,7 @@ class ReservationController extends Controller
      */
     public function destroy(Reservation $reservation)
     {
-        //
+        $reservation->delete();
+        return redirect()->route('reservations.index')->with('status', 'Reservation deleted successfully.');
     }
 }
